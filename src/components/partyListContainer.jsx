@@ -6,107 +6,106 @@ import PartyList from "./PartyList";
 import Cities from "./cities";
 
 function PartyContainer() {
-    //--------------------------- parties ---------------------------//
-    const [parties, setParties] = useState([]);
-    //--------------------------- parties ---------------------------//
+  const [parties, setParties] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [disabledState, setDisabledState] = useState({});
 
-    //--------------------------- users -----------------------------//
-    const [users, setUsers] = useState([]);
-    const auth = getAuth();
-    const user = auth.currentUser;
-    //--------------------------- users -----------------------------//
+  const auth = getAuth();
+  const user = auth.currentUser;
 
-    //--------------------------- DisableSystem -----------------------------------------------------------//
-    const [disabledState, setDisabledState] = useState({});
-    //---------------------------- DisableSystem ----------------------------------------------------------//
+  const upVote = async (id) => {
+    if (user) {
+      await updateDoc(doc(db, "parties", id), { vote: increment });
+      setParties(prevParties =>
+        prevParties.map(party => {
+          if (party.id === id) {
+            return { ...party, vote: party.vote + 1 };
+          }
+          return party;
+        })
+      );
 
-    const upVote = async (id) => {
-        if (user) {
-            //--------------------------- parties ----------------------------------//
-            const newParties = [...parties];
-            const partyIndex = parties.findIndex(p => p.id === id);
-            newParties[partyIndex].vote += 1;
-            setParties(newParties);
-            await updateDoc(doc(db, "parties", id), { vote: newParties[partyIndex].vote });
-            //--------------------------- parties ----------------------------------//
+      setDisabledState(prevDisabledState => ({
+        ...prevDisabledState,
+        [id]: true
+      }));
 
-            //--------------------------- DisableSystem ----------------------------//
-            const updatedDisabledState = { ...disabledState };
-            updatedDisabledState[id] = true;
-            setDisabledState(updatedDisabledState);
-            //--------------------------- DisableSystem ----------------------------//
+      await setDoc(doc(db, "users", user.uid), { testUpBoolean: true }, { merge: true });
+    } else {
+      alert("You need to login to vote");
+    }
+  };
 
-            //--------------------------- users ------------------------------------//
-            await setDoc(doc(db, "users", (userId.userId)), { testUpBoolean: true, testDownBoolean: false }, { merge: true });
-            //--------------------------- users ------------------------------------//
+  const downVote = async (id) => {
+    if (user) {
+      await updateDoc(doc(db, "parties", id), { vote: decrement });
+      setParties(prevParties =>
+        prevParties.map(party => {
+          if (party.id === id) {
+            return { ...party, vote: party.vote - 1 };
+          }
+          return party;
+        })
+      );
 
-        }else {
-        alert("You need to login to vote");
+      setDisabledState(prevDisabledState => ({
+        ...prevDisabledState,
+        [id]: true
+      }));
+
+      await setDoc(doc(db, "users", user.uid), { testDownBoolean: true }, { merge: true });
+    } else {
+      alert("You need to login to vote");
+    }
+  };
+
+  const filterPartiesByCity = (parties) => {
+    const filteredParties = parties.filter((party) => party.city === "guarapuava");
+    if (filteredParties.length > 0) {
+      filteredParties.forEach((party) => {
+        console.log(party.name);
+      });
+    } else {
+      console.log("No parties found in guarapuava");
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const dataParties = await getDocs(collection(db, "parties"));
+      const initParties = dataParties.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+      setParties(initParties);
+
+      const dataUsers = await getDocs(collection(db, "users"));
+      setUsers(dataUsers.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+
+      const disabledStateFromFirestore = dataUsers.docs.reduce((state, doc) => {
+        const { id, testUpBoolean, testDownBoolean } = doc.data();
+        if (id && (testUpBoolean || testDownBoolean)) {
+          return { ...state, [id]: true };
         }
+        return state;
+      }, {});
+      setDisabledState(disabledStateFromFirestore);
+
+      filterPartiesByCity(initParties);
     };
-
-    const downVote = async (id) => {
-        if (user) {
-            //------------------- parties -----------------------------------------//
-            const newParties = [...parties];
-            const partyIndex = parties.findIndex(p => p.id === id);
-            newParties[partyIndex].vote -= 1;
-            setParties(newParties);
-            await updateDoc(doc(db, "parties", id), { vote: newParties[partyIndex].vote });
-            //------------------- parties -----------------------------------------//
-
-            //------------------- DisableSystem -----------------------------------------//
-            const updatedDisabledState = { ...disabledState };
-            updatedDisabledState[id] = true;
-            setDisabledState(updatedDisabledState);
-            //------------------- DisableSystem -----------------------------------------//
-
-            //------------------- users -----------------------------------------//
-            await setDoc(doc(db, "users", (userId.userId)), { testUpBoolean: true, testDownBoolean: false }, { merge: true });
-            //------------------- users -----------------------------------------//
-        } else {
-        alert("You need to login to vote");
-        }
-    };
-
-    useEffect(() => {
-        const fetchData = async () => {
-            //--------------------------- parties -------------------------------------------------------------//
-            const dataParties = await getDocs(collection(db, "parties"));
-            const initParties = dataParties.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-            setParties(initParties);
-            //--------------------------- parties -------------------------------------------------------------//
-
-            //--------------------------- users ---------------------------------------------------------------//
-            const dataUsers = await getDocs(collection(db, "users"));
-            setUsers(dataUsers.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-            //---------------------------- users ---------------------------------------------------------------//
-
-            //--------------------------- DisableSystem --------------------------------------------------------//
-            const disabledStateFromFirestore = dataUsers.docs.map((doc) => doc.data().testUpBoolean);
-            const updatedDisabledState = {};
-            disabledStateFromFirestore.forEach((state, index) => {
-                updatedDisabledState[initParties[index].id] = state;
-            });
-            setDisabledState(updatedDisabledState);
-            //--------------------------- DisableSystem ----------------------------------------------------------//
-        };
 
     fetchData();
-    }, []); 
+  }, []);
 
-    return (
-        <>
-            <Cities/>
-            <PartyList
-            parties={parties}
-            users={users}
-            disabledState={disabledState}
-            upVote={upVote}
-            downVote={downVote}
-            />
-        </>
-    );
+  return (
+    <>
+      <Cities />
+      <PartyList
+        parties={parties}
+        users={users}
+        disabledState={disabledState}
+        upVote={upVote}
+        downVote={downVote}
+      />
+    </>
+  );
 }
 
 export default PartyContainer;

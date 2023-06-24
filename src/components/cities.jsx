@@ -5,8 +5,10 @@ function Cities() {
 
 
   const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
+    const selectedCity = event.target.value;
+    setSelectedOption(selectedCity);
   };
+  
 
   return (
     <div>
