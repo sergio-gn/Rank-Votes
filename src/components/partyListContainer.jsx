@@ -13,53 +13,51 @@ function PartyContainer() {
   const auth = getAuth();
   const user = auth.currentUser;
 
-  const upVote = async (id) => {
+  const upVote = async (partyID) => {
     if (user) {
-      const partyIndex = parties.findIndex(party => party.id === id);
+      const partyIndex = parties.findIndex(party => party.id === partyID);
       const updatedVoteCount = parties[partyIndex].vote + 1;
-      
-      await updateDoc(doc(db, "parties", id), { vote: updatedVoteCount });
+
+      await updateDoc(doc(db, "parties", partyID), { vote: updatedVoteCount });
       setParties(prevParties => {
         const updatedParties = [...prevParties];
         updatedParties[partyIndex].vote = updatedVoteCount;
         return updatedParties;
       });
-  
+
       setDisabledState(prevDisabledState => ({
         ...prevDisabledState,
-        [id]: true
+        [partyID]: true
       }));
-  
+
       await setDoc(doc(db, "users", user.uid), { testUpBoolean: true }, { merge: true });
     } else {
       alert("You need to login to vote");
     }
   };
-  
-  const downVote = async (id) => {
+
+  const downVote = async (partyID) => {
     if (user) {
-      const partyIndex = parties.findIndex(party => party.id === id);
+      const partyIndex = parties.findIndex(party => party.id === partyID);
       const updatedVoteCount = parties[partyIndex].vote - 1;
-  
-      await updateDoc(doc(db, "parties", id), { vote: updatedVoteCount });
+
+      await updateDoc(doc(db, "parties", partyID), { vote: updatedVoteCount });
       setParties(prevParties => {
         const updatedParties = [...prevParties];
         updatedParties[partyIndex].vote = updatedVoteCount;
         return updatedParties;
       });
-  
+
       setDisabledState(prevDisabledState => ({
         ...prevDisabledState,
-        [id]: true
+        [partyID]: true
       }));
-  
+
       await setDoc(doc(db, "users", user.uid), { testDownBoolean: true }, { merge: true });
     } else {
       alert("You need to login to vote");
     }
   };
-  
-  
 
   const filterPartiesByCity = (parties) => {
     const filteredParties = parties.filter((party) => party.city === "guarapuava");
@@ -76,7 +74,7 @@ function PartyContainer() {
     const fetchData = async () => {
       const dataParties = await getDocs(collection(db, "parties"));
       const initParties = dataParties.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-      
+
       const dataUsers = await getDocs(collection(db, "users"));
       const usersData = dataUsers.docs.reduce((users, doc) => {
         const { id, testUpBoolean, testDownBoolean } = doc.data();
@@ -85,7 +83,7 @@ function PartyContainer() {
         }
         return users;
       }, {});
-  
+
       const updatedParties = initParties.map((party) => {
         const { id } = party;
         const userData = usersData[id];
@@ -97,20 +95,19 @@ function PartyContainer() {
         }
         return party;
       });
-  
+
       setParties(updatedParties);
       setUsers(dataUsers.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
       setDisabledState(usersData);
-      
+
       filterPartiesByCity(updatedParties);
     };
-  
+
     fetchData();
   }, []);
-  
 
   return (
-    <>
+    <div className="partyListContainer">
       <Cities />
       <PartyList
         parties={parties}
@@ -119,7 +116,7 @@ function PartyContainer() {
         upVote={upVote}
         downVote={downVote}
       />
-    </>
+    </div>
   );
 }
 

@@ -31,7 +31,7 @@ nav{
   width: 100%;
   left: 0;
   right: 0;
-
+  z-index: 99;
   list-style: none;
   display: flex;
 }
@@ -45,7 +45,13 @@ nav ul {
 }
 
 .header{
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
   display: flex;
+  height: 5rem;
+  z-index: 99;
   justify-content: space-between;
   align-items: center;
 }
@@ -61,7 +67,6 @@ nav ul {
 }
 .container-card{
   display: flex;
-  height: 15rem;
 }
 .buttons{
   display: flex;
@@ -79,8 +84,6 @@ nav ul {
   width: 100%;
   /* align-items: center; */
   /* padding: 2em 0; */
-  overflow: hidden;
-  height: 13rem;
 }
 .card img{
   height: 6.5rem;
@@ -90,9 +93,7 @@ nav ul {
 .card h2{
   font-size: 1.6rem;
   position: relative;
-  margin: -2.3rem 0 0 0;
   text-align: left;
-  background: #feec60;
   padding: 1rem 1.25rem 1rem 1.25rem;
   border-radius: 0rem 0.7rem 0.7rem 0;
   font-family: 'Poppins-SemiBold';
@@ -101,6 +102,8 @@ nav ul {
 
 .card-list{
   display: flex;
+  gap: 1rem; 
+  align-items: center;
   list-style: none;
   flex-direction: row;
   justify-content: space-between;
@@ -117,4 +120,7 @@ nav ul {
 }
 .read-the-docs {
   color: #888;
+}
+.partyListContainer{
+  margin: 5rem 0;
 }

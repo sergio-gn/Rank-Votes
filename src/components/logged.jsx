@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
-import PartyHunter from "../assets/profile.png";
+import Profile from "../assets/profile.png";
 
 function Logged() {
   const [displayName, setDisplayName] = useState("");
@@ -18,7 +18,7 @@ function Logged() {
   return (
     <div className="d-flex align-items-center">
         <p>{displayName}</p>
-        <img className="user-icon" src={PartyHunter} alt="Profile" />
+        <img className="user-icon" src={Profile} alt="Profile" />
     </div>
   );
 }

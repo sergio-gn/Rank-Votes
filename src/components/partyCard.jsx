@@ -1,5 +1,4 @@
 import { TiArrowUpThick, TiArrowDownThick } from "react-icons/ti";
-import partyPhoto from '../assets/party.webp';
 
 function PartyCard({ party, disabledState, upVote, downVote }) {
   return (
@@ -13,8 +12,7 @@ function PartyCard({ party, disabledState, upVote, downVote }) {
           <TiArrowDownThick style={{ fontSize: "2rem" }} />
         </button>
       </div>
-      <div className="card">
-        <img src={partyPhoto} alt="Party" />
+      <div className="card d-flex">
         <h2 className="partyname">{party.name}</h2>
         <ul className="card-list">
           <li>Place: {party.place}</li>

@@ -3,7 +3,7 @@ import {BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Feed from './pages/Feed'
-import PartyHunter from './assets/partyhunter.svg'
+import RankVotes from './assets/RankVotes.svg'
 import { TiUser, TiHome, TiHeart} from "react-icons/ti";
 
 
@@ -40,7 +40,7 @@ function App() {
         <div className="header">
           <Link to="/">
             <div className="logo">
-              <img src={PartyHunter} alt="Party Hunter Logo" />
+              <img src={RankVotes} alt="Rank Votes" />
             </div>
           </Link>
           <div className="login">

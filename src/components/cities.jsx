@@ -9,16 +9,15 @@ function Cities() {
     setSelectedOption(selectedCity);
   };
   
-
   return (
     <div>
       <select value={selectedOption} onChange={handleOptionChange}>
-        <option value="">Qual Cidade?</option>
-        <option value="Curitiba">Curitiba</option>
-        <option value="Guarapuava">Guarapuava</option>
-        <option value="Ponta Grossa">Ponta Grossa</option>
+        <option>City?</option>
+        <option value="NewYork">New York</option>
+        <option value="Tokyo">Tokyo</option>
+        <option value="Paris">Paris</option>
       </select>
-      <p>Voce esta em: {selectedOption}</p>
+      <p>You are in: {selectedOption}</p>
     </div>
   );
 }
