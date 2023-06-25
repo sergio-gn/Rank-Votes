@@ -1,12 +1,17 @@
 import PartyCard from "./partyCard";
 
-function PartyList({ parties, disabledState, upVote, downVote }) {
+function PartyList({ parties, disabledState, upVote, downVote, selectedCity }) {
   // Ranking sort
   parties.sort((a, b) => parseFloat(b.vote) - parseFloat(a.vote));
 
+  // Filter parties based on selected city
+  const filteredParties = selectedCity
+    ? parties.filter((party) => party.city === selectedCity)
+    : parties;
+
   return (
     <div className="ranking">
-      {parties.map((party, index) => (
+      {filteredParties.map((party, index) => (
         <PartyCard
           key={index}
           party={party}
@@ -18,5 +23,6 @@ function PartyList({ parties, disabledState, upVote, downVote }) {
     </div>
   );
 }
+
 
 export default PartyList;

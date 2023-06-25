@@ -10,6 +10,8 @@ function PartyContainer() {
   const [users, setUsers] = useState([]);
   const [disabledState, setDisabledState] = useState({});
 
+  const [selectedCity, setSelectedCity] = useState("");
+
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -59,14 +61,14 @@ function PartyContainer() {
     }
   };
 
-  const filterPartiesByCity = (parties) => {
-    const filteredParties = parties.filter((party) => party.city === "guarapuava");
+  const filterPartiesByCity = (selectedCity) => {
+    const filteredParties = parties.filter((party) => party.city === selectedCity);
     if (filteredParties.length > 0) {
       filteredParties.forEach((party) => {
         console.log(party.name);
       });
     } else {
-      console.log("No parties found in guarapuava");
+      console.log(`No parties found in ${selectedCity}`);
     }
   };
 
@@ -101,20 +103,21 @@ function PartyContainer() {
       setDisabledState(usersData);
 
       filterPartiesByCity(updatedParties);
+      console.log("UseEffect triggered in partyListContainer")
     };
-
     fetchData();
   }, []);
 
   return (
     <div className="partyListContainer">
-      <Cities />
+      <Cities filterPartiesByCity={filterPartiesByCity} />
       <PartyList
         parties={parties}
         users={users}
         disabledState={disabledState}
         upVote={upVote}
         downVote={downVote}
+        selectedCity={selectedCity}
       />
     </div>
   );
