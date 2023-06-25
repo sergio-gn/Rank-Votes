@@ -3,17 +3,22 @@ import { collection, getDocs, updateDoc, doc, setDoc } from 'firebase/firestore'
 import { db } from '../firebaseconfig';
 import { getAuth } from "firebase/auth";
 import PartyList from "./PartyList";
-import Cities from "./cities";
+import SelectCities from "./selectCities";
 
 function PartyContainer() {
   const [parties, setParties] = useState([]);
   const [users, setUsers] = useState([]);
   const [disabledState, setDisabledState] = useState({});
 
-  const [selectedCity, setSelectedCity] = useState("");
+
 
   const auth = getAuth();
   const user = auth.currentUser;
+
+
+
+  const [selectedCity, setSelectedCity] = useState("");
+
 
   const upVote = async (partyID) => {
     if (user) {
@@ -66,6 +71,7 @@ function PartyContainer() {
     if (filteredParties.length > 0) {
       filteredParties.forEach((party) => {
         console.log(party.name);
+        setSelectedCity(selectedCity);
       });
     } else {
       console.log(`No parties found in ${selectedCity}`);
@@ -102,7 +108,6 @@ function PartyContainer() {
       setUsers(dataUsers.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
       setDisabledState(usersData);
 
-      filterPartiesByCity(updatedParties);
       console.log("UseEffect triggered in partyListContainer")
     };
     fetchData();
@@ -110,15 +115,19 @@ function PartyContainer() {
 
   return (
     <div className="partyListContainer">
-      <Cities filterPartiesByCity={filterPartiesByCity} />
-      <PartyList
-        parties={parties}
-        users={users}
-        disabledState={disabledState}
-        upVote={upVote}
-        downVote={downVote}
-        selectedCity={selectedCity}
-      />
+      <SelectCities filterPartiesByCity={filterPartiesByCity} />
+      {selectedCity ? (
+        <PartyList
+          parties={parties}
+          users={users}
+          disabledState={disabledState}
+          upVote={upVote}
+          downVote={downVote}
+          selectedCity={selectedCity}
+        />
+      ) : (
+        ""
+      )}
     </div>
   );
 }
