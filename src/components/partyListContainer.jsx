@@ -15,49 +15,51 @@ function PartyContainer() {
 
   const upVote = async (id) => {
     if (user) {
-      await updateDoc(doc(db, "parties", id), { vote: increment });
-      setParties(prevParties =>
-        prevParties.map(party => {
-          if (party.id === id) {
-            return { ...party, vote: party.vote + 1 };
-          }
-          return party;
-        })
-      );
-
+      const partyIndex = parties.findIndex(party => party.id === id);
+      const updatedVoteCount = parties[partyIndex].vote + 1;
+      
+      await updateDoc(doc(db, "parties", id), { vote: updatedVoteCount });
+      setParties(prevParties => {
+        const updatedParties = [...prevParties];
+        updatedParties[partyIndex].vote = updatedVoteCount;
+        return updatedParties;
+      });
+  
       setDisabledState(prevDisabledState => ({
         ...prevDisabledState,
         [id]: true
       }));
-
+  
       await setDoc(doc(db, "users", user.uid), { testUpBoolean: true }, { merge: true });
     } else {
       alert("You need to login to vote");
     }
   };
-
+  
   const downVote = async (id) => {
     if (user) {
-      await updateDoc(doc(db, "parties", id), { vote: decrement });
-      setParties(prevParties =>
-        prevParties.map(party => {
-          if (party.id === id) {
-            return { ...party, vote: party.vote - 1 };
-          }
-          return party;
-        })
-      );
-
+      const partyIndex = parties.findIndex(party => party.id === id);
+      const updatedVoteCount = parties[partyIndex].vote - 1;
+  
+      await updateDoc(doc(db, "parties", id), { vote: updatedVoteCount });
+      setParties(prevParties => {
+        const updatedParties = [...prevParties];
+        updatedParties[partyIndex].vote = updatedVoteCount;
+        return updatedParties;
+      });
+  
       setDisabledState(prevDisabledState => ({
         ...prevDisabledState,
         [id]: true
       }));
-
+  
       await setDoc(doc(db, "users", user.uid), { testDownBoolean: true }, { merge: true });
     } else {
       alert("You need to login to vote");
     }
   };
+  
+  
 
   const filterPartiesByCity = (parties) => {
     const filteredParties = parties.filter((party) => party.city === "guarapuava");
@@ -74,25 +76,38 @@ function PartyContainer() {
     const fetchData = async () => {
       const dataParties = await getDocs(collection(db, "parties"));
       const initParties = dataParties.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-      setParties(initParties);
-
+      
       const dataUsers = await getDocs(collection(db, "users"));
-      setUsers(dataUsers.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-
-      const disabledStateFromFirestore = dataUsers.docs.reduce((state, doc) => {
+      const usersData = dataUsers.docs.reduce((users, doc) => {
         const { id, testUpBoolean, testDownBoolean } = doc.data();
-        if (id && (testUpBoolean || testDownBoolean)) {
-          return { ...state, [id]: true };
+        if (id) {
+          users[id] = { testUpBoolean, testDownBoolean };
         }
-        return state;
+        return users;
       }, {});
-      setDisabledState(disabledStateFromFirestore);
-
-      filterPartiesByCity(initParties);
+  
+      const updatedParties = initParties.map((party) => {
+        const { id } = party;
+        const userData = usersData[id];
+        if (userData) {
+          return {
+            ...party,
+            vote: userData.testUpBoolean ? party.vote + 1 : userData.testDownBoolean ? party.vote - 1 : party.vote
+          };
+        }
+        return party;
+      });
+  
+      setParties(updatedParties);
+      setUsers(dataUsers.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      setDisabledState(usersData);
+      
+      filterPartiesByCity(updatedParties);
     };
-
+  
     fetchData();
   }, []);
+  
 
   return (
     <>
