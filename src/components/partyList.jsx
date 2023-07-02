@@ -2,9 +2,7 @@ import PartyCard from "./partyCard";
 
 function PartyList({ parties, disabledState, upVote, downVote, selectedCity }) {
   // Filter parties based on selected city
-  const filteredParties = selectedCity
-    ? parties.filter((party) => party.city === selectedCity)
-    : parties;
+  const filteredParties = selectedCity ? parties.filter((party) => party.city === selectedCity): parties;
 
   // Ranking sort
   filteredParties.sort((a, b) => parseFloat(b.vote) - parseFloat(a.vote));

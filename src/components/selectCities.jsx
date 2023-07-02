@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function selectCities({ filterPartiesByCity }) {
+function SelectCities({ filterPartiesByCity, parties }) {
   const [selectedOption, setSelectedOption] = useState("");
 
   const handleOptionChange = (event) => {
@@ -9,19 +9,24 @@ function selectCities({ filterPartiesByCity }) {
     filterPartiesByCity(selectedCity);
   };
 
+  // Extract unique city names from the parties prop
+  const cities = [...new Set(parties.map((party) => party.city))];
+
   return (
     <div>
       <select value={selectedOption} onChange={handleOptionChange}>
         <option disabled value="">
           Please Select a City
         </option>
-        <option value="newyork">New York</option>
-        <option value="tokyo">Tokyo</option>
-        <option value="paris">Paris</option>
+        {cities.map((city) => (
+          <option key={city} value={city}>
+            {city}
+          </option>
+        ))}
       </select>
-      {selectedOption ? ( <p>You are in: {selectedOption}</p>) : ("")}
+      {selectedOption ? <p>You are in: {selectedOption}</p> : ""}
     </div>
   );
 }
 
-export default selectCities;
+export default SelectCities;

@@ -10,15 +10,10 @@ function PartyContainer() {
   const [users, setUsers] = useState([]);
   const [disabledState, setDisabledState] = useState({});
 
-
-
   const auth = getAuth();
   const user = auth.currentUser;
 
-
-
   const [selectedCity, setSelectedCity] = useState("");
-
 
   const upVote = async (partyID) => {
     if (user) {
@@ -115,19 +110,11 @@ function PartyContainer() {
 
   return (
     <div className="partyListContainer">
-      <SelectCities filterPartiesByCity={filterPartiesByCity} />
+      <SelectCities parties={parties} filterPartiesByCity={filterPartiesByCity} />
+
       {selectedCity ? (
-        <PartyList
-          parties={parties}
-          users={users}
-          disabledState={disabledState}
-          upVote={upVote}
-          downVote={downVote}
-          selectedCity={selectedCity}
-        />
-      ) : (
-        ""
-      )}
+        <PartyList parties={parties} users={users} disabledState={disabledState} upVote={upVote} downVote={downVote} selectedCity={selectedCity}/>
+      ) : ("")}
     </div>
   );
 }
