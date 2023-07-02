@@ -124,3 +124,14 @@ nav ul {
 .partyListContainer{
   margin: 5rem 0;
 }
+
+
+/******* admin ********/ 
+.deleteParties{
+  overflow: scroll;
+}
+.partyCardAdmin{
+  border: solid 1px #fff;
+  border-radius: 1rem;
+  margin: 1rem;
+}
