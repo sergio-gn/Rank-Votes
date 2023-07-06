@@ -135,3 +135,21 @@ nav ul {
   border-radius: 1rem;
   margin: 1rem;
 }
+
+
+
+
+/******responsive************/
+@media(min-width:1100px) {
+  .header{
+    left:10rem;
+    width: 85%;
+  }
+  nav {
+    height: 100%;
+    width: 6rem;
+  }
+  nav ul{
+    flex-direction: column;
+  }
+}
